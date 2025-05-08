@@ -1,0 +1,44 @@
+{
+  "name": "course-reminder-backend",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.7.0",
+    "@types/cors": "^2.8.17",
+    "@types/morgan": "^1.9.9",
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "faker-js": "^1.0.0",
+    "google-spreadsheet": "^4.1.4",
+    "googleapis": "^148.0.0",
+    "grammy": "^1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3",
+    "ngrok": "^5.0.0-beta.2",
+    "node-cron": "^3.0.3",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^6.10.1",
+    "sequelize": "^6.37.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4",
+    "@types/node-cron": "^3.0.11",
+    "@types/node-schedule": "^2.1.7",
+    "@types/nodemailer": "^6.4.17",
+    "ts-node-dev": "^2",
+    "typescript": "^5"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
