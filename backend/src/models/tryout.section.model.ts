@@ -37,12 +37,12 @@ TryoutSection.init(
       primaryKey: true,
     },
     code: {
-      type: DataTypes.STRING(),
+      type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: false,
     },
     title: {
-      type: DataTypes.STRING(),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     courseId: {

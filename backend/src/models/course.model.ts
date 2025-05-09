@@ -37,12 +37,12 @@ Course.init(
       primaryKey: true,
     },
     code: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: false,
     },
     title: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     description: {

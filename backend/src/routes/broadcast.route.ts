@@ -13,4 +13,5 @@ router.post('/:id/execute', broadcastController.executeManually);
 router.get('/scheduler/status', broadcastController.getJobStatus);
 router.get('/:id/next-reminder', broadcastController.getNextReminderTime);
 router.post('/test-telegram', broadcastController.testTelegramMessage);
+router.post('/test-email', broadcastController.testEmailReminder);
 export default router;
