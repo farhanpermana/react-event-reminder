@@ -46,6 +46,7 @@ tsconfig.tsbuildinfo
 .env.development.local
 .env.test
 .env.test.local
+config.json
 
 # Optional: ignore ngrok tunnel files or auth tokens
 .ngrok.log
