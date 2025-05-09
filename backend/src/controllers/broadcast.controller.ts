@@ -5,6 +5,7 @@ import googleSheetService from '../services/googlesheet.service';
 import schedulerService from '../services/scheduler.service';
 import logger from '../utils/logger';
 import telegramService  from '../services/telegram.service';
+import emailService  from '../services/email.service';
 
 
 class BroadcastController {
@@ -162,6 +163,45 @@ async testTelegramMessage(req: Request, res: Response) {
       console.error('Error sending test message:', error);
       return res.status(500).json({ 
         error: 'Failed to send test message',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  async testEmailReminder(req: Request, res: Response) {
+    try {
+      const { username, message } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ 
+          error: 'Message content is required' 
+        });
+      }
+  
+      const subject = 'Test Email Reminder';
+      const htmlContent = emailService.generateEmailTemplate({
+        userName: username ?? 'Test User',
+        title: 'Test Reminder',
+        message,
+        companyName: 'Your Company'
+      });
+  
+      let result;
+      if (username) {
+        result = await emailService.sendReminderToSpecificUser(username, subject, htmlContent);
+      } else {
+        result = await emailService.sendReminderToAllUsers(subject, htmlContent);
+      }
+  
+      return res.json({
+        success: true,
+        message: 'Test email reminder sent',
+        result
+      });
+    } catch (error) {
+      logger.error('Error sending test email reminder:', error);
+      return res.status(500).json({ 
+        error: 'Failed to send test email',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
     }
