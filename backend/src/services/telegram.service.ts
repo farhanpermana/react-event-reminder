@@ -9,7 +9,7 @@ import { generateRandomUser } from '../utils/helper'; // Import your helper
 // Simple email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Map to track users waiting for real email input for new registrations
-const waitingForRealEmail = new Map<number, { username: string; generatedFullName: string; generatedPhoneNumber: string }>();
+const waitingForRealEmail = new Map<number, { username: string; generatedFullName: string; generatedPhoneNumber: string,  generatedPassword: string }>();
 
 class TelegramService {
   async initialize() {
@@ -43,7 +43,7 @@ class TelegramService {
       // Check if a new user is waiting for their real email input
       if (waitingForRealEmail.has(telegramId)) {
         const registrationData = waitingForRealEmail.get(telegramId)!;
-        const { username, generatedFullName, generatedPhoneNumber } = registrationData;
+        const { username, generatedFullName, generatedPhoneNumber, generatedPassword } = registrationData;
 
         // Validate email format
         if (!emailRegex.test(messageText)) {
@@ -81,7 +81,8 @@ class TelegramService {
             email: messageText, // User's real email
             fullName: generatedFullName,
             phoneNumber: generatedPhoneNumber,
-            isActive: true,
+            password: generatedPassword,
+            isActive: 1,
             data: {
               telegram: {
                 id: telegramId,
@@ -196,6 +197,7 @@ class TelegramService {
         username: newUsername,
         generatedFullName: randomUser.fullName,
         generatedPhoneNumber: randomUser.phoneNumber,
+        generatedPassword: randomUser.password
       });
 
       await ctx.reply(

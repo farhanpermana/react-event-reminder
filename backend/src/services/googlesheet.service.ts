@@ -110,7 +110,7 @@ class GoogleSheetService {
   
     return {
       synced: syncedCount,
-      message: `Successfully soft-synced ${syncedCount} broadcasts from Google Sheets.`,
+      message: `Successfully synced ${syncedCount} broadcasts from Google Sheets.`,
     };
   }
 }

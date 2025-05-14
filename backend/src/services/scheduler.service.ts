@@ -146,14 +146,14 @@ class SchedulerService {
 
     try {
       let referenceEntity;
-      let startDate;
+      let startDate: Date | undefined; // Explicitly type startDate as potentially undefined
 
       if (referenceType === 'tryout-section') {
         referenceEntity = await TryoutSection.findOne({
           where: { code: referenceCode },
         });
 
-        if (referenceEntity) {
+        if (referenceEntity?.startDateTime) {
           startDate = new Date(referenceEntity.startDateTime);
         }
       } else if (referenceType === 'course') {
@@ -161,7 +161,7 @@ class SchedulerService {
           where: { code: referenceCode },
         });
 
-        if (referenceEntity) {
+        if (referenceEntity?.startDate) {
           startDate = new Date(referenceEntity.startDate);
         }
       }
@@ -171,7 +171,7 @@ class SchedulerService {
         return;
       }
 
-      // targetTime for on-going can be like "1d" for 1 day before, "2h" for 2 hours before
+      // Now startDate is guaranteed to have a value due to the check above
       let reminderTime;
 
       if (/^(\d+)d$/.test(targetTime)) {
