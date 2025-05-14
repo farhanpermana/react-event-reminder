@@ -17,6 +17,7 @@ export const generateRandomUser = () => {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const fullName = `${firstName} ${lastName}`;
+  const password = faker.internet.password();
   
   // Generate a username with random numbers appended
   let username = `${firstName.toLowerCase()}${lastName.substring(0, 2).toLowerCase()}${Math.floor(Math.random() * 1000)}`;
@@ -27,5 +28,6 @@ export const generateRandomUser = () => {
     email: faker.internet.email({ firstName, lastName }).toLowerCase(),
     fullName,
     phoneNumber: faker.phone.number(),
+    password
   };
 };
