@@ -7,6 +7,16 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "src/types/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
