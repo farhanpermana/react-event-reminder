@@ -3,6 +3,7 @@ import { JWT } from 'google-auth-library';
 import { google, sheets_v4 } from 'googleapis';
 import dotenv from 'dotenv';
 import { Broadcast } from '../models';
+import { Op } from 'sequelize';
 
 dotenv.config();
 
@@ -79,40 +80,76 @@ class GoogleSheetService {
     return row?.content ?? null;
   }
 
-  async syncToDatabase() {
-    const sheetRows = await this.fetchAll();
-    let syncedCount = 0;
-  
-    for (const row of sheetRows) {
-      // Skip rows missing required fields
-      if (!row.code || !row.content || !row.type || !row.scheduleType || !row.targetTime) {
-        console.warn(`Skipping incomplete row:`, row);
-        continue;
-      }
-  
-      // Perform upsert based on unique code
-      await Broadcast.upsert({
-        code: row.code,
-        content: row.content,
-        username: row.username,
-        imageUrl: row.image,
-        imageType: row.imageType,
-        referenceType: row.referenceType,
-        referenceCode: row.referenceCode,
-        type: row.type,
-        scheduleType: row.scheduleType,
-        targetTime: row.targetTime,
-        isActive: true
-      });
-  
-      syncedCount++;
+async syncToDatabase() {
+        const sheetRows = await this.fetchAll();
+        let syncedCount = 0;
+
+        // Kumpulkan semua kode yang ada di Google Sheet
+        const sheetCodes = new Set<string>();
+        for (const row of sheetRows) {
+            if (row.code) { // Pastikan kode ada sebelum menambahkannya
+                sheetCodes.add(row.code);
+            }
+        }
+
+        // 1. Upsert (perbarui/buat) record dari Google Sheet
+        for (const row of sheetRows) {
+            if (!row.code || !row.content || !row.type || !row.scheduleType || !row.targetTime) {
+                console.warn(`Skipping incomplete row from sheet:`, row);
+                continue;
+            }
+
+            await Broadcast.upsert({
+                code: row.code,
+                content: row.content,
+                username: row.username,
+                imageUrl: row.image,
+                imageType: row.imageType,
+                referenceType: row.referenceType,
+                referenceCode: row.referenceCode,
+                type: row.type,
+                scheduleType: row.scheduleType,
+                targetTime: row.targetTime,
+                isActive: true // Set aktif untuk record yang ada di sheet
+            });
+            syncedCount++;
+        }
+
+        // 2. Deaktivasi atau Hapus record yang tidak lagi ada di Google Sheet
+        // Kamu bisa memilih antara menghapus (destroy) atau menonaktifkan (update isActive: false)
+        // MenNonaktifkan (Soft Delete) biasanya lebih aman untuk audit trail
+        const recordsToDeactivate = await Broadcast.findAll({
+            where: {
+                // Temukan semua record di DB yang code-nya TIDAK ada di sheetCodes
+                code: {
+                    [Op.notIn]: Array.from(sheetCodes)
+                },
+                isActive: true // Hanya yang aktif, untuk menghindari re-deaktivasi yang tidak perlu
+            }
+        });
+
+        let deactivatedCount = 0;
+        for (const record of recordsToDeactivate) {
+            await record.update({ isActive: false }); // Nonaktifkan record
+            deactivatedCount++;
+        }
+
+        // Atau, jika kamu ingin menghapus secara permanen:
+        // const deletedCount = await Broadcast.destroy({
+        //     where: {
+        //         code: {
+        //             [Op.notIn]: Array.from(sheetCodes)
+        //         }
+        //     }
+        // });
+
+
+        return {
+            synced: syncedCount,
+            deactivated: deactivatedCount, // Tambahkan ini di respons
+            message: `Successfully synced ${syncedCount} broadcasts and deactivated ${deactivatedCount} non-existent broadcasts from Google Sheets.`,
+        };
     }
-  
-    return {
-      synced: syncedCount,
-      message: `Successfully synced ${syncedCount} broadcasts from Google Sheets.`,
-    };
-  }
 }
 
 export default new GoogleSheetService();
